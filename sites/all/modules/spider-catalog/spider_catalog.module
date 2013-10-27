@@ -1,0 +1,503 @@
+<?php
+/**
+ * @file
+ * Spider Catalog module for Drupal 7.
+ *
+ * Written by Webdorado team.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function spider_catalog_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#spider_catalog":
+      $output = '';
+      $output .= '<h3>' . t('Spider Catalog module help.') . '</h3>';
+      $output .= t("Download 'jscolor' library from !url_jscolor and extract it to <b>'sites/all/libraries/jscolor'</b> directory.<br /><br />
+                    To show HTML editor download 'tinymce' library from !url_html_tiny and extract it to <b>'sites/all/libraries/tinymce'</b> directory.<br /><br />
+                    Go to !url_create_cal to create or edit Categories, Products, Themes.<br /><br />
+                    To show created products in list or in cells go to !url_create_content. Select category, choose category details show or no, select theme and save content.<br /><br />
+                    To show single poduct go to !url_create_single_content, select product, theme and save content.", array(
+                      '!url_jscolor' => l(t('here'), 'http://jscolor.com/release/jscolor-1.4.0.zip'),
+                      '!url_html_tiny' => l(t('here'), 'http://github.com/downloads/tinymce/tinymce/tinymce_3.5.7.zip'),
+                      '!url_create_cal' => l(t('Administer > Spider Catalog'), url('admin/settings/spider_catalog', array('absolute' => TRUE))),
+                      '!url_create_content' => l(t('Add content > Spider Catalog Product List'), url('node/add/spider-catalog-product-list', array('absolute' => TRUE))),
+                      '!url_create_single_content' => l(t('Add content > Spider Catalog Single Product'), url('node/add/spider-catalog-single-product', array('absolute' => TRUE))),
+                    ));
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function spider_catalog_permission() {
+  return array(
+    'access Spider Catalog administration' => array(
+      'title' => t('Administer Spider Catalog module.'),
+    ),
+    'access Spider Catalog products administration' => array(
+      'title' => t('Administer Spider Catalog module products.'),
+    ),
+    'access Spider Catalog category administration' => array(
+      'title' => t('Administer Spider Catalog module categories.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function spider_catalog_menu() {
+  $items = array();
+  $items['admin/settings/spider_catalog'] = array(
+    'title' => 'Spider Catalog',
+    'description' => 'Spider Catalog module allow to create products.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_categories'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'file' => 'includes/spider_catalog_categories.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Categories.
+  $items['admin/settings/spider_catalog/categories'] = array(
+    'title' => 'Categories',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_categories'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'weight' => 1,
+    'file' => 'includes/spider_catalog_categories.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['admin/settings/spider_catalog/categories/publish'] = array(
+    'page callback' => 'spider_catalog_category_publish',
+    'access arguments' => array('access Spider Catalog category administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_categories.inc',
+  );
+  $items['admin/settings/spider_catalog/categories/unpublish'] = array(
+    'page callback' => 'spider_catalog_category_unpublish',
+    'access arguments' => array('access Spider Catalog category administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_categories.inc',
+  );
+  $items['admin/settings/spider_catalog/categories/delete'] = array(
+    'page callback' => 'spider_catalog_category_delete',
+    'access arguments' => array('access Spider Catalog category administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_categories.inc',
+  );
+  $items['admin/settings/spider_catalog/categories/ordering_save'] = array(
+    'page callback' => 'spider_catalog_save_ordering',
+    'access arguments' => array('access Spider Catalog category administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_categories.inc',
+  );
+  $items['admin/settings/spider_catalog/categories/edit'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_category_edit'),
+    'access arguments' => array('access Spider Catalog category administration'),
+    'file' => 'includes/spider_catalog_categories.inc',
+    'type' => MENU_CALLBACK,
+  );
+  // Products.
+  $items['admin/settings/spider_catalog/products'] = array(
+    'title' => 'Products',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_products'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'weight' => 2,
+    'file' => 'includes/spider_catalog_products.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['admin/settings/spider_catalog/products/publish'] = array(
+    'page callback' => 'spider_catalog_product_publish',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  $items['admin/settings/spider_catalog/products/unpublish'] = array(
+    'page callback' => 'spider_catalog_product_unpublish',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  $items['admin/settings/spider_catalog/products/delete'] = array(
+    'page callback' => 'spider_catalog_product_delete',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  $items['admin/settings/spider_catalog/products/ordering_save'] = array(
+    'page callback' => 'spider_catalog_product_save_ordering',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  $items['admin/settings/spider_catalog/products/edit'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_product_edit'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'file' => 'includes/spider_catalog_products.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/spider_catalog/products/edit/ratings'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_product_edit_ratings'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'file' => 'includes/spider_catalog_products.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/spider_catalog/products/edit/ratings/delete'] = array(
+    'page callback' => 'spider_catalog_rating_delete',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  $items['admin/settings/spider_catalog/products/edit/reviews'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_product_edit_reviews'),
+    'access arguments' => array('access Spider Catalog products administration'),
+    'file' => 'includes/spider_catalog_products.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/spider_catalog/products/edit/reviews/delete'] = array(
+    'page callback' => 'spider_catalog_review_delete',
+    'access arguments' => array('access Spider Catalog products administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_products.inc',
+  );
+  // Global options.
+  $items['admin/settings/spider_catalog/global_options'] = array(
+    'title' => 'Global Options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_global_options'),
+    'access arguments' => array('access Spider Catalog administration'),
+    'weight' => 3,
+    'file' => 'includes/spider_catalog_global_options.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  // Themes.
+  $items['admin/settings/spider_catalog/themes'] = array(
+    'title' => 'Themes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_themes'),
+    'access arguments' => array('access Spider Catalog administration'),
+    'weight' => 4,
+    'file' => 'includes/spider_catalog_themes.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['admin/settings/spider_catalog/themes/edit'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('spider_catalog_theme_edit'),
+    'access arguments' => array('access Spider Catalog administration'),
+    'file' => 'includes/spider_catalog_themes.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/spider_catalog/themes/delete'] = array(
+    'page callback' => 'spider_catalog_theme_delete',
+    'access arguments' => array('access Spider Catalog administration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_themes.inc',
+  );
+  // Captcha.
+  $items['spider_catalog/captcha'] = array(
+    'page callback' => 'spider_catalog_captcha',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_captcha.inc',
+  );
+  // Star rate.
+  $items['spider_catalog/star_rate'] = array(
+    'page callback' => 'spider_catalog_star_rate',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_star_rate.inc',
+  );
+  // For view product from list or cell.
+  $items['spider_catalog/product_view'] = array(
+    'page callback' => 'spider_catalog_single_product',
+    'page arguments' => array('', ''),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/spider_catalog_single_product_view.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function spider_catalog_node_info() {
+  return array(
+    'spider_catalog_single_product' => array(
+      'name' => t('Spider Catalog Single Product'),
+      'base' => 'spider_catalog',
+      'module' => 'spider_catalog',
+      'description' => t("Create a new Single Product with Spider Catalog module."),
+    ),
+    'spider_catalog_product_list' => array(
+      'name' => t('Spider Catalog Product List'),
+      'base' => 'spider_catalog',
+      'module' => 'spider_catalog',
+      'description' => t("Create a new Product List with Spider Catalog module."),
+    ),
+  );
+}
+
+/**
+ * Implements hook_form().
+ */
+function spider_catalog_form(&$node, &$form_state) {
+  $form = array();
+  $themes = db_query("SELECT id,title FROM {spider_catalog_themes} ORDER BY title")->fetchAllKeyed();
+  if (isset($node->nid)) {
+    $catalog_row = db_query("SELECT * FROM {spider_catalog_form_table} WHERE vid=:vid", array(':vid' => $node->nid))->fetchObject();
+    $default_category = $catalog_row->category;
+    $default_product = $catalog_row->product;
+    $default_theme = $catalog_row->theme;
+    $product_display_type = $catalog_row->product_display_type;
+    $show_category_details = $catalog_row->show_category_details;
+  }
+  else {
+    $default_product = '';
+    $default_category = 0;
+    $default_theme = 1;
+    $product_display_type = 'cells';
+    $show_category_details = 1;
+  }
+  if ($node->type == 'spider_catalog_single_product') {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+      '#required' => TRUE,
+      '#default_value' => $node->title,
+    );
+    $products = db_query("SELECT id,name FROM {spider_catalog_products} WHERE published=:published ORDER BY name", array(':published' => 1))->fetchAllKeyed();
+    $form['product'] = array(
+      '#type' => 'select',
+      '#title' => t('Select product'),
+      '#description' => t('Select the product.'),
+      '#default_value' => $default_product,
+      '#empty_option' => t('-Select-'),
+      '#required' => FALSE,
+      '#options' => $products,
+    );
+    $form['theme'] = array(
+      '#type' => 'select',
+      '#title' => t('Select theme'),
+      '#description' => t('Select the product theme.'),
+      '#default_value' => $default_theme,
+      '#required' => FALSE,
+      '#options' => $themes,
+    );
+  }
+  elseif ($node->type == 'spider_catalog_product_list') {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+      '#required' => TRUE,
+      '#default_value' => $node->title,
+    );
+    $category[0] = t('-All categories-');
+    $category += db_query("SELECT id,name FROM {spider_catalog_product_categories} WHERE published=:published ORDER BY ordering", array(':published' => 1))->fetchAllKeyed();
+    $form['category'] = array(
+      '#type' => 'select',
+      '#title' => t('Select category'),
+      '#description' => t('Select the category.'),
+      '#default_value' => $default_category,
+      '#required' => FALSE,
+      '#options' => $category,
+    );
+    $form['show_category_details'] = array(
+      '#type' => 'radios',
+      '#title' => t('Show category details'),
+      '#default_value' => $show_category_details,
+      '#required' => FALSE,
+      '#options' => array(1 => t('Show'), 0 => t('Hide')),
+    );
+    $form['product_display_type'] = array(
+      '#type' => 'radios',
+      '#title' => t('Product display type'),
+      '#default_value' => $product_display_type,
+      '#required' => FALSE,
+      '#options' => array('cells' => t('Cells'), 'list' => t('List')),
+    );
+    $form['theme'] = array(
+      '#type' => 'select',
+      '#title' => t('Select theme'),
+      '#description' => t('Select the product theme.'),
+      '#default_value' => $default_theme,
+      '#required' => FALSE,
+      '#options' => $themes,
+    );
+  }
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function spider_catalog_node_insert($node) {
+  if ($node->type == 'spider_catalog_single_product') {
+    $type = 'spider_catalog_single_product';
+    $category = '';
+    $show_category_details = '';
+    $product_display_type = '';
+    $product = $node->product;
+    $theme = $node->theme;
+    db_insert('spider_catalog_form_table')->fields(array(
+      'vid' => $node->nid,
+      'type' => $type,
+      'category' => $category,
+      'show_category_details' => $show_category_details,
+      'product_display_type' => $product_display_type,
+      'product' => $product,
+      'theme' => $theme,
+    ))->execute();
+    db_query("UPDATE {node_revision} SET comment=:comment WHERE nid=:nid", array(':comment' => 0, ':nid' => $node->nid));
+  }
+  elseif ($node->type == 'spider_catalog_product_list') {
+    $type = 'spider_catalog_product_list';
+    $category = $node->category;
+    $show_category_details = $node->show_category_details;
+    $product_display_type = $node->product_display_type;
+    $product = '';
+    $theme = $node->theme;
+    db_insert('spider_catalog_form_table')->fields(array(
+      'vid' => $node->nid,
+      'type' => $type,
+      'category' => $category,
+      'show_category_details' => $show_category_details,
+      'product_display_type' => $product_display_type,
+      'product' => $product,
+      'theme' => $theme,
+    ))->execute();
+    db_query("UPDATE {node_revision} SET comment=:comment WHERE nid=:nid", array(':comment' => 0, ':nid' => $node->nid));
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function spider_catalog_node_update($node) {
+  if ($node->type == 'spider_catalog_single_product') {
+    $type = 'spider_catalog_single_product';
+    $category = '';
+    $show_category_details = '';
+    $product_display_type = '';
+    $product = $node->product;
+    $theme = $node->theme;
+    db_query("UPDATE {spider_catalog_form_table} SET product=:product,theme=:theme WHERE vid=:vid AND type=:type", array(
+      ':product' => $product,
+      ':theme' => $theme,
+      ':vid' => $node->nid,
+      ':type' => $type,
+    ));
+  }
+  elseif ($node->type == 'spider_catalog_product_list') {
+    $type = 'spider_catalog_product_list';
+    $category = $node->category;
+    $show_category_details = $node->show_category_details;
+    $product_display_type = $node->product_display_type;
+    $product = '';
+    $theme = $node->theme;
+    db_query("UPDATE {spider_catalog_form_table} SET category=:category,show_category_details=:show_category_details,product_display_type=:product_display_type,theme=:theme WHERE vid=:vid AND type=:type", array(
+      ':category' => $category,
+      ':show_category_details' => $show_category_details,
+      ':product_display_type' => $product_display_type,
+      ':theme' => $theme,
+      ':vid' => $node->nid,
+      ':type' => $type,
+    ));
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function spider_catalog_node_delete($node) {
+  db_query("DELETE FROM {spider_catalog_form_table} WHERE vid=:vid", array(':vid' => $node->nid));
+  db_query("DELETE FROM {node} WHERE nid=:nid", array(':nid' => $node->nid));
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function spider_catalog_node_view($node, $view_mode) {
+  $teaser = $view_mode == 'teaser';
+  $page = arg(0) == 'node' && arg(1) == $node->nid;
+  if (($teaser) || empty($node->uid)) {
+    return;
+  }
+  $row = db_query("SELECT * FROM {spider_catalog_form_table} WHERE vid=:vid", array(':vid' => $node->nid))->fetchObject();
+  if ($node->type == 'spider_catalog_single_product') {
+    if ($row->product == '') {
+      $node_view = '<div class="messages error">' . t('The Product is not chosen. Select Product !url.', array(
+        '!url' => l(t('here'), url('node/' . $node->nid . '/edit', array(
+          'absolute' => TRUE))))) . '</div>';
+    }
+    else {
+      require_once "includes/spider_catalog_single_product_view.inc";
+      $node_view = spider_catalog_single_product($row->product, $row->theme);
+    }
+  }
+  elseif ($node->type == 'spider_catalog_product_list') {
+    if ($row->product_display_type == 'list') {
+      require_once "includes/spider_catalog_product_list_view.inc";
+      $node_view = spider_catalog_product_list($row->theme, $row->category, $row->show_category_details);
+    }
+    elseif ($row->product_display_type == 'cells') {
+      require_once "includes/spider_catalog_product_cells_view.inc";
+      $node_view = spider_catalog_product_cells($row->theme, $row->category, $row->show_category_details);
+    }
+  }
+  else {
+    $node_view = '';
+  }
+  $node->content['spider_catalog'] = array(
+    '#node' => $node,
+    '#teaser' => $teaser,
+    '#page' => $page,
+    '#markup' => $node_view,
+    '#enabled' => TRUE,
+    '#weight' => 10,
+  );
+}
+
+/**
+ * Implements hook_library().
+ */
+function spider_catalog_library() {
+  $libraries = array(
+    'jscolor' => array(
+      'version' => '1.3.9',
+      'js' => array(
+        'sites/all/libraries/jscolor/jscolor.js' => array(
+          'group' => JS_LIBRARY,
+        ),
+      ),
+    ),
+    'tinymce' => array(
+      'version' => '3.5.7',
+      'js' => array(
+        'sites/all/libraries/tinymce/jscripts/tiny_mce/tiny_mce.js' => array(
+          'group' => JS_LIBRARY,
+        ),
+      ),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_init().
+ */
+function spider_catalog_init() {
+  drupal_add_css(drupal_get_path('module', 'spider_catalog') . '/css/spider_catalog_fieldset.css');
+}

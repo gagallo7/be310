@@ -1,0 +1,12 @@
+name = Spider Catalog
+description = "Spider Catalog module allows to create Categories with their custom fields for products."
+core = 7.x
+package = Spider Catalog
+configure = admin/settings/spider_catalog
+
+; Information added by drupal.org packaging script on 2013-05-03
+version = "7.x-1.0"
+core = "7.x"
+project = "spider-catalog"
+datestamp = "1367594713"
+

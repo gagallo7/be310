@@ -1,0 +1,696 @@
+<?php
+/**
+ * @file
+ * Spider Catalog module install/schema hooks.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function spider_catalog_schema() {
+  $schema['spider_catalog_form_table'] = array(
+    'description' => 'The Spider Catalog nodes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'category' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'show_category_details' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'product_display_type' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'product' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'theme' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_catalog_params'] = array(
+    'description' => 'The Spider Catalog global parameters.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'category_details_width' => array(
+        'type' => 'varchar',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'price' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'market_price' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'currency_symbol' => array(
+        'type' => 'varchar',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'currency_symbol_position' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'product_ratings' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'customer_reviews' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'search_by_category' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+      'search_by_name' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_catalog_products'] = array(
+    'description' => 'Spider Catalog products.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'category_id' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'short_description' => array(
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'image_url' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'cost' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'market_cost' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'param' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'ordering' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'published' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_catalog_product_categories'] = array(
+    'description' => 'Spider Catalog products categories.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+      'category_image_url' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'param' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'ordering' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'published' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['spider_catalog_product_reviews'] = array(
+    'description' => 'Spider Catalog product reviews.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+      ),
+      'content' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'product_id' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'remote_ip' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_catalog_product_votes'] = array(
+    'description' => 'Spider Catalog product votes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'remote_ip' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'not null' => TRUE,
+      ),
+      'vote_value' => array(
+        'type' => 'int',
+        'length' => 3,
+        'not null' => TRUE,
+      ),
+      'product_id' => array(
+        'type' => 'int',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['spider_catalog_themes'] = array(
+    'description' => 'The table for Themes.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'rounded_corners' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'background_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'parameters_background_ccolor_1' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'parameters_background_ccolor_2' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'border_style' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'border_width' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'border_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'text_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'color_of_parameter_values' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'hyperlink_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'price_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'title_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'title_background_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'color_of_text_of_buttons' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'buttons_background_color' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'rating_star_design' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'category_picture_width' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'category_picture_height' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'category_title_size' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'count_of_products_in_the_row' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'count_of_rows_in_the_page' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'product_cell_width' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'product_cell_height' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'picture_width' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'picture_height' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'text_size' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'price_size' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'title_size' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'show_category' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'show_parameters' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'count_of_products_in_the_page_list' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'picture_width_list' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'picture_height_list' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'text_size_list' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'price_size_list' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'show_category_list' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'show_parameters_list' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'show_description_list' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'picture_width_product' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'picture_height_product' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'text_size_product' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'price_size_product' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'title_size_product' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'background_color_review' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'color_of_review_texts' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'background_color_review_author' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'background_color_review_text' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'number_of_reviews_per_page' => array(
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ),
+      'default_settings' => array(
+        'type' => 'int',
+        'length' => 5,
+        'not null' => TRUE,
+        'default_value' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function spider_catalog_enable() {
+  // Global options.
+  if (!db_query("SELECT id FROM {spider_catalog_params}")->fetchField()) {
+    db_insert('spider_catalog_params')->fields(array(
+      'category_details_width' => '600',
+      'price' => 1,
+      'market_price' => 1,
+      'currency_symbol' => '$',
+      'currency_symbol_position' => 1,
+      'product_ratings' => 1,
+      'customer_reviews' => 1,
+      'search_by_category' => 1,
+      'search_by_name' => 1,
+    ))->execute();
+  }
+  // Default category.
+  if (!db_query("SELECT id FROM {spider_catalog_product_categories}")->fetchField()) {
+    db_insert('spider_catalog_product_categories')->fields(array(
+      'name' => 'Televisions',
+      'category_image_url' => base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/Televisions.jpg#***#',
+      'description' => 'Television (TV) is a telecommunication medium for transmitting and receiving moving images that can be monochrome (black-and-white) or colored, with or without accompanying sound. "Television" may also refer specifically to a television set, television programming, or television transmission.The etymology of the word has a mixed Latin and Greek origin, meaning "far sight": Greek tele, far, and Latin visio, sight (from video, vis- to see, or to view in the first person).',
+      'param' => 'TV System#***#Diagonal#***#Interface#***#Refresh Rate#***#',
+      'ordering' => 1,
+      'published' => 1,
+    ))->execute();
+  }
+  // Default product.
+  if (!db_query("SELECT id FROM {spider_catalog_products}")->fetchField()) {
+    db_insert('spider_catalog_products')->fields(array(
+      'name' => 'Panasonic Television TX-PR50U30',
+      'category_id' => 1,
+      'description' => '<p>50" / 127 cm, Full-HD Plasma Display Panel, 600 Hz Sub Field Drive , DVB-T, DVB-C, RCA, RGB, VGA, HDMI x2, Scart, SD card</p>',
+      'short_description' => '<p>50" / 127 cm, Full-HD Plasma Display Panel, 600 Hz Sub Field Drive</p>',
+      'image_url' => base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/panasonic1.jpg#***#' . base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/panasonic2.jpg#***#' . base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/panasonic3.jpg#***#',
+      'cost' => '950.00',
+      'market_cost' => '1000.00',
+      'param' => 'TV System@@:@@DVB-T#***#DVB-C#***##@@@#Diagonal@@:@@50" / 127 cm#***##@@@#Interface@@:@@RCA, RGB, VGA, HDMI x2, Scart, SD card#***##@@@#Refresh Rate@@:@@600 Hz Sub Field Drive#***##@@@#',
+      'ordering' => 1,
+      'published' => 1,
+    ))->execute();
+    db_insert('spider_catalog_products')->fields(array(
+      'name' => 'Sony KDL-46EX710AEP',
+      'category_id' => 1,
+      'description' => '<p><b>Sony Television KDL-46EX710AEP</b></p><p>46" / 117 cm, MotionFlow 100Hz, Bravia Engine 3, Analog, DVB-T, DVB-C, 4xHDMI, VGA, RGB, RCA, USB, 2xSCART</p>',
+      'short_description' => '<p><b>Sony Television KDL-46EX710AEP</b></p><p>46" / 117 cm, MotionFlow 100Hz, Bravia Engine 3</p>',
+      'image_url' => base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/sony1.1.jpg#***#' . base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/sony1.2.jpg#***#' . base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/sony1.3.jpg#***#',
+      'cost' => '1450.00',
+      'market_cost' => '1700.00',
+      'param' => 'TV System@@:@@Analog#***#DVB-T#***#DVB-C#***##@@@#Diagonal@@:@@46" / 117 cm#***##@@@#Interface@@:@@4xHDMI, VGA, RGB, RCA, USB, 2xSCART#***##@@@#Refresh Rate@@:@@MotionFlow 100Hz#***##@@@#',
+      'ordering' => 2,
+      'published' => 1,
+    ))->execute();
+    db_insert('spider_catalog_products')->fields(array(
+      'name' => 'Samsung UE46D6100S',
+      'category_id' => 1,
+      'description' => '<p><strong>Samsung Television UE46D6100S </strong></p><p>46" / 117 cm, 200Hz , 6 Series, 3D, SMART TV ,Smarthub, 3D HyperReal Engine, Samsung Apps, Social TV, WiFi Ready</p>',
+      'short_description' => '<p><strong>Samsung Television UE46D6100S </strong></p><p>46" / 117 cm, 200Hz , 6 Series, 3D, SMART TV ,Smarthub, 3D HyperReal Engine</p>',
+      'image_url' => base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/samsung1.jpg#***#',
+      'cost' => '1630.00',
+      'market_cost' => '1900.00',
+      'param' => 'TV System@@:@@DTV#***#DVB-T/C#***##@@@#Diagonal@@:@@46" / 117 cm#***##@@@#Interface@@:@@4xHDMI,3xUSB, RGB, RCA, D-SUB,1xSCART, Ethernet (LAN)#***##@@@#Refresh Rate@@:@@200Hz#***##@@@#',
+      'ordering' => 3,
+      'published' => 1,
+    ))->execute();
+    db_insert('spider_catalog_products')->fields(array(
+      'name' => 'Sony KDL-32EX421BAEP',
+      'category_id' => 1,
+      'description' => '<p><strong>Sony Television KDL-32EX421BAEP </strong></p><p>32" / 80 cm, 50 Hz, Analog, DVB-T/T2/C, AV, SCART, RGB, VGA, HDMI x4, USB x2, Ethernet (RJ-45),24p True Cinema, X-Reality, DLNA, WiFi Ready, Internet Video, Internet Widgets, Web Browser, Skype, USB HDD Recording</p>',
+      'short_description' => '<p><strong>Sony Television KDL-32EX421BAEP </strong></p><p>32" / 80 cm, 50 Hz, Analog, DVB-T/T2/C, AV, SCART, RGB, VGA, HDMI x4, USB x2</p>',
+      'image_url' => base_path() . drupal_get_path('module', 'spider_catalog') . '/images/sampleimages/sony2.jpg#***#',
+      'cost' => '950.00',
+      'market_cost' => '0.00',
+      'param' => 'TV System@@:@@#***##@@@#Diagonal@@:@@32" / 80 cm#***##@@@#Interface@@:@@AV, VGA, HDMI, USB, Ethernet#***##@@@#Refresh Rate@@:@@#***##@@@#',
+      'ordering' => 4,
+      'published' => 1,
+    ))->execute();
+  }
+  // Default themes.
+  if (!db_query("SELECT id FROM {spider_catalog_themes}")->fetchField()) {
+    db_insert('spider_catalog_themes')->fields(array(
+      'title' => 'Default Theme',
+      'rounded_corners' => 1,
+      'background_color' => 'f2f2f2',
+      'parameters_background_ccolor_1' => 'c9effe',
+      'parameters_background_ccolor_2' => 'eff9fd',
+      'border_style' => 'solid',
+      'border_width' => '1',
+      'border_color' => '00aeef',
+      'text_color' => '20b8f1',
+      'color_of_parameter_values' => '2f699e',
+      'hyperlink_color' => '000000',
+      'price_color' => 'fc0303',
+      'title_color' => 'ffffff',
+      'title_background_color' => '00aeef',
+      'color_of_text_of_buttons' => 'ffffff',
+      'buttons_background_color' => '00aeef',
+      'rating_star_design' => '4',
+      'category_picture_width' => '350',
+      'category_picture_height' => '250',
+      'category_title_size' => '22',
+      'count_of_products_in_the_row' => '2',
+      'count_of_rows_in_the_page' => '3',
+      'product_cell_width' => '320',
+      'product_cell_height' => '520',
+      'picture_width' => '100',
+      'picture_height' => '100',
+      'text_size' => '12',
+      'price_size' => '20',
+      'title_size' => '16',
+      'show_category' => 1,
+      'show_parameters' => 1,
+      'count_of_products_in_the_page_list' => '10',
+      'picture_width_list' => '100',
+      'picture_height_list' => '100',
+      'text_size_list' => '14',
+      'price_size_list' => '18',
+      'show_category_list' => 1,
+      'show_parameters_list' => 1,
+      'show_description_list' => 0,
+      'picture_width_product' => '300',
+      'picture_height_product' => '250',
+      'text_size_product' => '12',
+      'price_size_product' => '20',
+      'title_size_product' => '16',
+      'background_color_review' => 'EFF9FD',
+      'color_of_review_texts' => '2f699e',
+      'background_color_review_author' => 'c9effe',
+      'background_color_review_text' => 'eff9fd',
+      'number_of_reviews_per_page' => '10',
+      'default_settings' => 1,
+    ))->execute();
+  }
+  // Default review.
+  if (!db_query("SELECT id FROM {spider_catalog_product_reviews}")->fetchField()) {
+    db_insert('spider_catalog_product_reviews')->fields(array(
+      'name' => 'A Customer',
+      'content' => 'A Good TV',
+      'product_id' => 1,
+      'remote_ip' => '127.0.0.1',
+    ))->execute();
+  }
+}
+
+/**
+ * Implements hook_disable().
+ */
+function spider_catalog_disable() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function spider_catalog_uninstall() {
+  variable_del('spider_catalog_search_categories_name');
+  variable_del('spider_catalog_search_products_name');
+  drupal_uninstall_schema('spider_catalog');
+  // Delete Spider Catalog content type and node coments.
+  $spider_catalog_nodes_col = db_query("SELECT nid FROM {node} WHERE type=:type OR type=:type", array(':type' => 'spider_catalog_single_product', ':type' => 'spider_catalog_product_list'))->fetchCol();
+  foreach ($spider_catalog_nodes_col as $spider_catalog_node_col) {
+    db_query('DELETE FROM {node_comment_statistics} WHERE nid=:nid', array(':nid' => $spider_catalog_node_col));
+  }
+  db_query("DELETE FROM {node} WHERE type=:type OR type=:type", array(':type' => 'spider_catalog_single_product', ':type' => 'spider_catalog_product_list'));
+}

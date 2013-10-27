@@ -1,0 +1,29 @@
+.spider_catalog_theme_global_fielset,
+.spider_catalog_theme_cells_page_options_fielset,
+.spider_catalog_theme_list_page_options_fielset,
+.spider_catalog_theme_product_page_options_fielset {
+  float: left;
+  margin-right: 10px;
+  width: 255px;
+}
+
+.spider_catalog_theme_select_fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+.form-item-rating-star-design {
+  display: inline-block;
+  padding: 5px !important;
+}
+
+#edit-rating-star-design-1,
+#edit-rating-star-design-2,
+#edit-rating-star-design-3,
+#edit-rating-star-design-4,
+#edit-rating-star-design-5 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+}

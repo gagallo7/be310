@@ -1,0 +1,9 @@
+.form-item-search-categories-name,
+.form-item-search-products-name {
+  display: inline;
+}
+
+#edit-product-edit-ratings,
+#edit-product-edit-reviews {
+  float: right;
+}
